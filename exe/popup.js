@@ -96,7 +96,8 @@ jQuery(document).ready(function () {
         }
 
         if (icon_align) {
-            syntax.push('&align=' + icon_align);
+            var sep = (!icon_size_pixel ? '?' : '&' )
+            syntax.push(sep + 'align=' + icon_align);
         }
 
         syntax.push('}}');
