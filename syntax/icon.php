@@ -357,6 +357,9 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
 
                         if ($value == 'center') {
                             $this->styles['text-align'] = 'center';
+                            $this->styles['margin'] = '0.2em auto';
+                            $this->styles['display'] = 'block'; 
+                            $this->styles['clear'] = 'both';
                         } else {
                             $this->styles['padding-' . (($value == 'left') ? 'right' : 'left')] = '.2em';
                             $this->styles['float']                                              = $value;
