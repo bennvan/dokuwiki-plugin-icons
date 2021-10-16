@@ -30,6 +30,7 @@ class action_plugin_icons extends DokuWiki_Action_Plugin
         #$controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, '_loadcss');
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, '_toolbarButton', array());
         $controller->register_hook('PLUGIN_POPULARITY_DATA_SETUP', 'AFTER', $this, '_popularity');
+        $controller->register_hook('PLUGIN_MOVE_HANDLERS_REGISTER', 'BEFORE', $this, 'handle_move_register');
     }
 
     /**
@@ -86,6 +87,26 @@ class action_plugin_icons extends DokuWiki_Action_Plugin
             '_data' => "Iconify.setConfig('defaultAPI', DOKU_BASE + 'lib/plugin/icons/exe/iconify.php?prefix={prefix}&icons={icons}');"
         );
 
+    }
+
+    public function handle_move_register(Doku_Event $event, $params) {
+        $event->data['handlers']['icons_breeze']    = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_fa']        = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_fl']        = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_flag']      = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_fugue']     = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_glyphicon'] = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_icon']      = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_mdi']       = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_oxygen']    = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_ra']        = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_silk']      = array($this, 'rewrite_icon');
+        $event->data['handlers']['icons_typcn']     = array($this, 'rewrite_icon');
+    }
+
+    public function rewrite_icon($match, $state, $pos, $pluginname, helper_plugin_move_handler $handler) {
+        // icons have same syntax as normal dokuwiki link
+        $handler->internallink($match, $state, $pos);
     }
 
 }

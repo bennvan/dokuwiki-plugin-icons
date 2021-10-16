@@ -52,6 +52,77 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
         $this->Lexer->addSpecialPattern(sprintf($this->linkPattern, $this->pattern), $mode, 'plugin_icons_' . $this->getPluginComponent());
     }
 
+    public function resolveLinkUrl($link, Doku_Renderer $renderer)
+    {
+        global $ID;
+        global $conf;
+        global $INFO;
+
+        $type = $link['type'];
+        $id = $link['src'];
+
+        if ($type == 'externallink') {
+            // Just return the original
+            return array($id, true);
+        }
+
+        if ($type == 'interwikilink') {
+            //get interwiki URL
+            $exists = null;
+            $url    = $renderer->_resolveInterWiki($link['wikiname'], $link['wikiuri'], $exists);
+            return array($url, $exists);
+        }
+
+        if ($type == 'emaillink') {
+            // escape characters and return mailto
+            $address = $renderer->_xmlEntities($id);
+            $address = obfuscate($address);
+            if($conf['mailguard'] == 'visible') $address = rawurlencode($address);
+
+            return array('mailto:'.$address, true);
+        }
+
+        if ($type == 'locallink') {
+            // just return the hash as is
+            return array($id, true);
+        }
+
+        // Render an internallink
+
+        $params = '';
+        $parts  = explode('?', $id, 2);
+        if(count($parts) === 2) {
+            $id     = $parts[0];
+            $params = $parts[1];
+        }
+
+        // For empty $id we need to know the current $ID
+        // We need this check because _simpleTitle needs
+        // correct $id and resolve_pageid() use cleanID($id)
+        // (some things could be lost)
+        if($id === '') {
+            $id = $ID;
+        }
+
+        // now first resolve and clean up the $id
+        $exists = null;
+        resolve_pageid(getNS($ID), $id, $exists, $renderer->date_at, true);
+
+        //keep hash anchor
+        @list($id, $hash) = explode('#', $id, 2);
+        if(!empty($hash)) $hash = $renderer->_headerToLink($hash);
+
+        if($renderer->date_at) {
+            $params = $params.'&at='.rawurlencode($renderer->date_at);
+        }
+
+        // Build url
+        $url = wl($id, $params);
+        //keep hash
+        if($hash) $url .= '#'.$hash;
+        return array($url, $exists);
+    }
+
     /**
      * Handler to prepare matched data for the rendering process
      *
@@ -89,7 +160,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
             if (isset($title2)) {
                 $title = rtrim($title2, '}');
             }
-
+            $link_params = Icons_Handler_Parse_Link($url, $handler);
         }
 
         $align_left   = false;
@@ -117,8 +188,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
 
         $flags .= "&$align_flag";
 
-        return array($pack, $icon, explode('&', rtrim($flags, '&')), $title, $url, $match, $state, $pos);
-
+        return array($pack, $icon, explode('&', rtrim($flags, '&')), $title, $link_params, $match, $state, $pos);
     }
 
     /**
@@ -138,7 +208,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
 
         /** @var Doku_Renderer_xhtml $renderer */
 
-        list($pack, $icon, $flags, $title, $url) = $data;
+        list($pack, $icon, $flags, $title, $link_params) = $data;
         $this->parseFlags($pack, $icon, $flags);
 
         if ($this->isIcon()) {
@@ -165,22 +235,14 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
 
         }
 
-        if (isset($url)) {
+        if (isset($link_params)) {
 
             global $conf;
-            global $ID;
 
-            $is_external = false;
-            $exists      = false;
+            list($url, $exists) = $this->resolveLinkUrl($link_params, $renderer);
+            $is_external = ($link_params['type'] == 'externallink');
+
             $link        = array();
-
-            if (preg_match('/^(http?|ftp?|www?)/', $url)) {
-                $is_external = true;
-            } else {
-                resolve_pageid(getNS($ID), $url, $exists);
-                $url = wl($url);
-            }
-
             $link['target'] = ($is_external) ? $conf['target']['extern'] : $conf['target']['wiki'];
             $link['style']  = '';
             $link['pre']    = '';
@@ -444,4 +506,59 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
         return true;
     }
 
+}
+
+/**
+    * @param string $match matched syntax
+    * @param Duku handler
+    * @return bool mode handled?
+    */
+function Icons_Handler_Parse_Link($match, $handler=null) {
+
+    $link = $match;
+    // Split title from URL
+    $link = explode('|',$link,2);
+    if ( !isset($link[1]) ) {
+        $link[1] = null;
+    } 
+
+    $link[0] = trim($link[0]);
+
+    //decide which kind of link it is
+    if ( link_isinterwiki($link[0]) ) {
+        // Interwiki
+        $type = 'interwikilink';
+        $interwiki = explode('>',$link[0],2);
+        $wikiname = strtolower($interwiki[0]);
+        $wikiuri = $interwiki[1];
+        if ($handler) $handler->addCall($type,array($link[0],$link[1],$wikiname,$wikiuri,true),null);
+
+    }elseif ( preg_match('/^\\\\\\\\[^\\\\]+?\\\\/u',$link[0]) ) {
+        // Windows Share
+        $type = 'windowssharelink';  
+    }elseif ( preg_match('#^([a-z0-9\-\.+]+?)://#i',$link[0]) ) {
+        // external link (accepts all protocols)
+        $type = 'externallink';    
+    }elseif ( preg_match('<'.PREG_PATTERN_VALID_EMAIL.'>',$link[0]) ) {
+        // E-Mail (pattern above is defined in inc/mail.php)
+        $type = 'emaillink';
+        if ($handler) $handler->addCall($type,array($link[0],$link[1], true),null);
+    }elseif ( preg_match('!^#.+!',$link[0]) ){
+        // local link
+        $type = 'locallink';
+        if ($handler) $handler->addCall($type,array(substr($link[0],1),$link[1],true),null);
+    }else{
+        // internal link
+        $type = 'internallink';
+        if ($handler) $handler->addCall($type,array($link[0],$link[1], null, true),null);      
+    }
+
+    $params = array(
+        'type'=>$type,
+        'src'=>$link[0],
+        'title'=>$link[1],
+        'wikiname'=>(isset($wikiname) ? $wikiname : null),
+        'wikiuri'=>(isset($wikiuri) ? $wikiuri : null)
+    );
+    return $params;
 }
