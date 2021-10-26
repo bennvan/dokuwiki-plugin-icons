@@ -63,7 +63,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
 
         if ($type == 'externallink') {
             // Just return the original
-            return array($id, true);
+            return array($id, false);
         }
 
         if ($type == 'interwikilink') {
