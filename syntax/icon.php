@@ -249,6 +249,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
             $link['suf']    = '';
             $link['more']   = '';
             $link['class']  = '';
+            $link['rel']    = ($is_external) ? 'ugc noopener ' : '';
             $link['url']    = $url;
             $link['name']   = $icon_markup;
 
@@ -256,7 +257,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
                 $link['class'] = 'wikilink1';
             } else {
 
-                $link['rel'] = 'nofollow';
+                $link['rel'] .= 'nofollow';
 
                 if (!$is_external) {
                     $link['class'] = 'wikilink2';
