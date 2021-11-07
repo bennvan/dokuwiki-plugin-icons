@@ -293,7 +293,8 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
     }
 
     private static function toAttributes($attrs = array())
-    {
+    {  
+        if ($attrs === null) $attrs = array();
         return implode(' ', array_map(
             function ($val, $key) {
                 return $key . '="' . htmlspecialchars($val) . '"';
