@@ -23,6 +23,8 @@
 #
 #      (!) This file will be deleted on every upgrade of template
 
+use dokuwiki\Cache\Cache;
+
 $doku_inc_dirs = array(
     '/opt/bitnami/dokuwiki',                       # Bitnami (Docker)
     '/usr/share/webapps/dokuwiki',                 # Arch Linux
@@ -77,7 +79,7 @@ $params = array(
 
 $iconify_dir   = dirname(__FILE__) . '/../assets/iconify/json';
 $cache_key     = md5(serialize($params) . $conf['template'] . filemtime(__FILE__));
-$cache         = new cache($cache_key, '.js');
+$cache         = new Cache($cache_key, '.js');
 $cache->_event = 'ICONIFY_CACHE';
 $cache_files   = $params;
 $cache_files[] = __FILE__;
