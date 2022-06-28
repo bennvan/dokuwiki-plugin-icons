@@ -99,7 +99,7 @@ header('X-UA-Compatible: IE=edge,chrome=1');
   <style type="text/css">
     body { padding: 0 20px 20px 0; }
     main {  width: 80%; float:left; }
-    aside { width: 20%; float:left; overflow-y: scroll; height: calc(100vh - 68px); }
+    aside { width: 20%; float:left; overflow-y: scroll; height: calc(100vh - 68px); white-space: nowrap; }
     .btn-icon { margin: 4px; padding: 4px; }
     .collections { padding: 5px; }
     .collection-samples { margin-bottom: 10px; }
