@@ -97,16 +97,16 @@ header('X-UA-Compatible: IE=edge,chrome=1');
   <?php echo tpl_favicon(array('favicon', 'mobile')) ?>
   <?php tpl_metaheaders()?>
   <style type="text/css">
-    body { padding: 20px; }
-    main {  width: 75%; float:left; }
-    aside { width: 25%; float:left; overflow-y: scroll; height: 500px; }
+    body { padding: 0 20px 20px 0; }
+    main {  width: 80%; float:left; }
+    aside { width: 20%; float:left; overflow-y: scroll; height: calc(100vh - 68px); }
     .btn-icon { margin: 4px; padding: 4px; }
     .collections { padding: 5px; }
     .collection-samples { margin-bottom: 10px; }
     .collection-category { margin-top: 10px; }
     .collection-name { margin-left: 10px; }
-    .collection-box, .preview-box { padding: 5px; }
-    .collection-icons { overflow-y: auto; height: 250px; padding: 10px 0px; }
+    .collection-box, .preview-box { padding: 0 0 0 10px; }
+    .collection-icons { overflow-y: auto; height: calc(100vh - 68px - 139px - 110px); padding: 10px 0px; }
     .collection-info ul { margin: 0; padding: 0; }
     .collection-info ul li { display: inline-block; list-style-type: none; padding-right: 5px; }
     <?php if (!$use_glyphicons): ?>
@@ -172,7 +172,7 @@ header('X-UA-Compatible: IE=edge,chrome=1');
         </div>
         <div class="collection-icons">
           <?php foreach (array_keys($collection_data['icons']) as $icon): ?>
-            <div class="col-sm-4">
+            <div class="col-sm-4 col-md-3">
               <button class="btn btn-default btn-xs btn-icon" title="<?php echo $icon ?>" data-icon-name="<?php echo $icon ?>">
                 <span class="iconify" data-icon="<?php echo $collection_name; ?>:<?php echo $icon ?>" data-height="32"></span>
               </button>
@@ -223,8 +223,6 @@ header('X-UA-Compatible: IE=edge,chrome=1');
           </div>
 
         </div>
-
-        <p>&nbsp;</p>
 
         <label>Preview</label>
         <pre id="preview"></pre>
