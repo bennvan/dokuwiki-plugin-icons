@@ -60,7 +60,7 @@ $JSINFO['id']        = '';
 $JSINFO['namespace'] = '';
 
 $tmp = array();
-trigger_event('MEDIAMANAGER_STARTED', $tmp);
+\dokuwiki\Extension\Event::createAndTrigger('MEDIAMANAGER_STARTED', $tmp);
 session_write_close(); //close session
 
 $icons_plugin = plugin_load('action', 'icons');
@@ -109,13 +109,11 @@ header('X-UA-Compatible: IE=edge,chrome=1');
     .collection-icons { overflow-y: auto; height: calc(100vh - 68px - 139px - 110px); padding: 10px 0px; }
     .collection-info ul { margin: 0; padding: 0; }
     .collection-info ul li { display: inline-block; list-style-type: none; padding-right: 5px; }
-    <?php if (!$use_glyphicons): ?>
     footer { bottom: 20px; position: fixed; }
     .col-sm-6 { width:50%; float: left; }
     .col-sm-4 { width:33.3%; float: left; }
     /**.tab-pane, .hide { display: none; }**/
     button.active { border-style: inset; }
-    <?php endif;?>
   </style>
   <script type="text/javascript" src="popup.js" defer="defer"></script>
 </head>
