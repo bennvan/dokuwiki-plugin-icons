@@ -105,7 +105,10 @@ class action_plugin_icons extends DokuWiki_Action_Plugin
     }
 
     public function rewrite_icon($match, $state, $pos, $pluginname, helper_plugin_move_handler $handler) {
-        // icons have same syntax as normal dokuwiki link
+        // Only linked icons contain a page target; standalone icons are not media.
+        if ($state !== DOKU_LEXER_SPECIAL || substr($match, 0, 2) !== '[[') {
+            return $match;
+        }
         $handler->internallink($match, $state, $pos);
     }
 
