@@ -24,6 +24,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
     protected $flags   = array();
     protected $classes = array();
     protected $styles  = array();
+    protected $attrs   = array();
 
     /**
      * Syntax Type
@@ -98,15 +99,15 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
 
         // For empty $id we need to know the current $ID
         // We need this check because _simpleTitle needs
-        // correct $id and resolve_pageid() use cleanID($id)
+        // correct $id and page resolution uses cleanID($id)
         // (some things could be lost)
         if($id === '') {
             $id = $ID;
         }
 
         // now first resolve and clean up the $id
-        $exists = null;
-        resolve_pageid(getNS($ID), $id, $exists, $renderer->date_at, true);
+        $id = (new \dokuwiki\File\PageResolver($ID))->resolveId($id, $renderer->date_at, true);
+        $exists = page_exists($id, $renderer->date_at, false, true);
 
         //keep hash anchor
         @list($id, $hash) = explode('#', $id, 2);
@@ -140,10 +141,11 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
         $title = null;
         $pack  = null;
         $icon  = null;
+        $link_params = null;
 
         $match = substr($match, 2, -2); // strip markup
 
-        @list($match, $title, $title2) = explode('|', $match);
+        list($match, $title, $title2) = array_pad(explode('|', $match), 3, null);
 
         if (isset($title2)) {
             $title .= '}}';
@@ -155,7 +157,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
             $match = $title;
 
             $match               = substr($match, 2, -2); // strip markup
-            list($match, $title) = explode('|', $match);
+            list($match, $title) = array_pad(explode('|', $match, 2), 2, null);
 
             if (isset($title2)) {
                 $title = rtrim($title2, '}');
@@ -183,7 +185,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
             $align_flag   = "align=center";
         }
 
-        list($match, $flags) = explode('?', trim($match), 2);
+        list($match, $flags) = array_pad(explode('?', trim($match), 2), 2, '');
         list($pack, $icon)   = explode('>', trim($match), 2);
 
         $flags .= "&$align_flag";
@@ -219,7 +221,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
             $icon_url        = $this->makePath($icon, $icon_size, $icon_base_url);
             $cached_icon_url = ml($icon_url, array('cache' => 'recache', 'w' => $icon_size, 'h' => $icon_size));
             $icon_markup     = sprintf('<img src="%s" title="%s" class="%s" style="%s" />',
-                $cached_icon_url, $title,
+                $cached_icon_url, hsc($title ?? ''),
                 $this->toClassString($this->getClasses()),
                 $this->toInlineStyle($this->getStyles()));
 
@@ -230,7 +232,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
             }
 
             $icon_markup = sprintf('<span class="iconify dw-icons %s" style="%s" title="%s" data-icon="%s" %s></span>',
-                $this->toClassString($this->getClasses()), $this->toInlineStyle($this->getStyles()), $title, $icon, $this->toAttributes($this->attrs)
+                $this->toClassString($this->getClasses()), $this->toInlineStyle($this->getStyles()), hsc($title ?? ''), $icon, $this->toAttributes($this->attrs)
             );
 
         }
@@ -252,6 +254,7 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
             $link['rel']    = ($is_external) ? 'ugc noopener ' : '';
             $link['url']    = $url;
             $link['name']   = $icon_markup;
+            $link['title']  = hsc($title ?? '');
 
             if ($exists) {
                 $link['class'] = 'wikilink1';
@@ -335,11 +338,12 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
         $this->flags   = array();
         $this->classes = array();
         $this->styles  = array();
+        $this->attrs   = array();
 
         $this->flags['pack'] = $pack;
         $this->flags['icon'] = $icon;
 
-        if ((int) $flags[0] > 0 && !in_array($flags[0], array('2x', '3x', '4x', '5x'))) {
+        if ((int) ($flags[0] ?? '') > 0 && !in_array($flags[0], array('2x', '3x', '4x', '5x'))) {
             $flags[] = "size=" . $flags[0];
             unset($flags[0]);
         }
