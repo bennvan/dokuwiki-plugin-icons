@@ -79,11 +79,6 @@ $params = array(
 
 $iconify_dir   = dirname(__FILE__) . '/../assets/iconify/json';
 $cache_key     = md5(serialize($params) . $conf['template'] . filemtime(__FILE__));
-$cache         = new Cache($cache_key, '.js');
-$cache->setEvent('ICONIFY_CACHE');
-$cache_files   = $params;
-$cache_files[] = __FILE__;
-$cache_ok      = $cache->useCache(array('files' => $cache_files));
 $content_type  = 'application/javascript; charset=utf-8';
 
 if ($params['icon']) {
@@ -91,18 +86,20 @@ if ($params['icon']) {
     list($params['prefix'], $params['icons']) = explode('-', str_replace('.svg', '', $params['icon']), 2);
 }
 
-header("Content-Type: $content_type");
-
-http_cached($cache->cache, $cache_ok);
-
 $collection_file = "$iconify_dir/" . $params['prefix'] . ".json.gz";
 
-if (!file_exists($collection_file)) {
+if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $params['prefix']) || !is_file($collection_file)) {
     header('Content-Type: text/plain; charset=utf-8', true);
     http_status(404);
     print "Not Found";
     exit;
 }
+
+$cache = new Cache($cache_key, '.js');
+$cache->setEvent('ICONIFY_CACHE');
+$cache_ok = $cache->useCache(array('files' => array(__FILE__, $collection_file)));
+header("Content-Type: $content_type");
+http_cached($cache->cache, $cache_ok);
 
 $collection_data = json_decode(io_readFile($collection_file), true);
 
@@ -119,7 +116,7 @@ foreach (explode(',', $params['icons']) as $icon) {
         $icon                           = $collection_data['aliases'][$icon]['parent'];
     }
 
-    if (!$icon_data = $collection_data['icons'][$icon]) {
+    if (!$icon_data = ($collection_data['icons'][$icon] ?? null)) {
         continue;
     }
 
@@ -184,8 +181,10 @@ if ($params['callback']) {
         $body = str_replace('currentColor', $fill, $body);
     }
 
-    $svg     = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="%s" height="%s" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">%s</svg>';
-    $content = sprintf($svg, $width, $height, $body);
+    $view_width = (int) ($collection_data['icons'][$icon]['width'] ?? $collection_data['width'] ?? 16);
+    $view_height = (int) ($collection_data['icons'][$icon]['height'] ?? $collection_data['height'] ?? 16);
+    $svg     = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="%s" height="%s" preserveAspectRatio="xMidYMid meet" viewBox="0 0 %d %d" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);">%s</svg>';
+    $content = sprintf($svg, hsc($width), hsc($height), $view_width, $view_height, $body);
 
 } else {
 

@@ -17,6 +17,31 @@ jQuery(document).ready(function () {
         $output = jQuery('#output'),
         $preview = jQuery('#preview');
 
+    var $search = jQuery('#icon-search');
+    function normalizeName(value) {
+        return value.trim().toLowerCase().replace(/[\s_]+/g, '-');
+    }
+    var icons = jQuery('.collection-icons .icon-entry').toArray().map(function (element) {
+        return {
+            element: element,
+            name: normalizeName(element.querySelector('[data-icon-name]').getAttribute('data-icon-name'))
+        };
+    });
+    function filterIcons() {
+        var query = normalizeName($search.val() || '');
+        var count = 0;
+        icons.forEach(function (icon) {
+            var matches = icon.name.indexOf(query) !== -1;
+            icon.element.hidden = !matches;
+            if (matches) count++;
+        });
+        jQuery('#icon-search-count').text(count + ' of ' + icons.length + ' icons');
+        jQuery('#icon-search-empty').prop('hidden', count !== 0);
+        jQuery('.collection-icons').scrollTop(0);
+    }
+    $search.on('input search', filterIcons);
+    filterIcons();
+
     if (!is_bootstrap) {
         //jQuery('.tab-pane').hide();
     }
@@ -73,9 +98,7 @@ jQuery(document).ready(function () {
             return false;
         }
 
-        var syntax = ['{{icon'];
-
-        syntax.push('>' + icon_pack + ':' + icon_name);
+        var syntax = [icon_pack === 'fa' ? '{{fa>' + icon_name : '{{icon>' + icon_pack + ':' + icon_name];
 
         var icon_size_pixel = 0;
 
@@ -91,14 +114,11 @@ jQuery(document).ready(function () {
                 break;
         }
 
-        if (icon_size_pixel) {
-            syntax.push('?' + icon_size_pixel);
-        }
-
-        if (icon_align) {
-            var sep = (!icon_size_pixel ? '?' : '&' );
-            syntax.push(sep + 'align=' + icon_align);
-        }
+        var flags = [];
+        if (icon_size_pixel) flags.push(icon_size_pixel);
+        else if (icon_size === 'fw') flags.push('fw');
+        if (icon_align) flags.push('align=' + icon_align);
+        if (flags.length) syntax.push('?' + flags.join('&'));
 
         syntax.push('}}');
 
@@ -112,6 +132,8 @@ jQuery(document).ready(function () {
     });
 
     jQuery(document).on('popup:reset', function () {
+        $search.val('');
+        filterIcons();
         jQuery('form').each(function () {
             jQuery(this)[0].reset();
         });

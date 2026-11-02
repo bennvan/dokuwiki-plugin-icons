@@ -8,7 +8,7 @@
  */
 
 $conf['defaultSize']       = '16';
-$conf['defaultPack']       = 'fa';
+$conf['defaultPack']       = 'fa'; // Bundled Font Awesome Free (solid preferred, plus brands).
 
 $conf['fugueURL']          = 'https://raw.githubusercontent.com/yusukekamiyamane/fugue-icons/master';
 $conf['oxygenURL']         = 'https://raw.githubusercontent.com/KDE/oxygen-icons/tree/master';

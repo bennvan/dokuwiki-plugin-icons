@@ -29,6 +29,7 @@ class action_plugin_icons extends DokuWiki_Action_Plugin
     {
         #$controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, '_loadcss');
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, '_toolbarButton', array());
+        $controller->register_hook('JS_CACHE_USE', 'BEFORE', $this, 'toolbarCacheDependency');
         $controller->register_hook('PLUGIN_POPULARITY_DATA_SETUP', 'AFTER', $this, '_popularity');
         $controller->register_hook('PLUGIN_MOVE_HANDLERS_REGISTER', 'BEFORE', $this, 'handle_move_register');
     }
@@ -47,10 +48,16 @@ class action_plugin_icons extends DokuWiki_Action_Plugin
             'icon'    => '../../tpl/dokuwiki/images/logo.png',
             'url'     => 'lib/plugins/icons/exe/popup.php?ns=',
             'name'    => 'icons',
-            'options' => 'width=800,height=600,left=20,top=20,toolbar=no,menubar=no,scrollbars=yes,resizable=yes',
+            'options' => 'width=800,height=770,left=20,top=20,toolbar=no,menubar=no,scrollbars=yes,resizable=yes',
             'block'   => false,
         );
 
+    }
+
+    /** Toolbar definitions are embedded in DokuWiki's cached JavaScript. */
+    public function toolbarCacheDependency(Doku_Event $event, $param)
+    {
+        $event->data->depends['files'][] = __FILE__;
     }
 
     /**

@@ -66,13 +66,14 @@ session_write_close(); //close session
 $icons_plugin = plugin_load('action', 'icons');
 
 $popup_url = DOKU_BASE . 'lib/plugins/icons/exe/popup.php';
-$pack      = $INPUT->str('pack');
+$pack      = $INPUT->str('pack', $icons_plugin->getConf('defaultPack'));
 
 $collections_dir    = dirname(__FILE__) . '/../assets/iconify/json';
 $collections        = json_decode(file_get_contents(dirname(__FILE__) . '/../assets/iconify/collections.json'), true);
 $custom_collections = json_decode(file_get_contents(dirname(__FILE__) . '/../assets/iconify/custom-collections.json'), true);
 
 $collections = array_merge($collections, $custom_collections);
+if (!isset($collections[$pack])) $pack = 'fa';
 $categories  = array();
 
 ksort($collections);
@@ -97,29 +98,44 @@ header('X-UA-Compatible: IE=edge,chrome=1');
   <?php echo tpl_favicon(array('favicon', 'mobile')) ?>
   <?php tpl_metaheaders()?>
   <style type="text/css">
-    body { padding: 0 20px 20px 0; }
-    main {  width: 80%; float:left; }
-    aside { width: 20%; float:left; overflow-y: scroll; height: calc(100vh - 68px); white-space: nowrap; }
+    body { height: 100vh; margin: 0; padding: 0 !important; display: flex; flex-direction: column; overflow: hidden; }
+    .popup-content { display: flex; flex: 1; min-height: 0; padding-right: 20px; }
+    main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-y: auto; }
+    aside { flex: 0 0 20%; min-width: 0; overflow: auto; overflow-wrap: anywhere; }
     .btn-icon { margin: 4px; padding: 4px; }
     .collections { padding: 5px; }
     .collection-samples { margin-bottom: 10px; }
     .collection-category { margin-top: 10px; }
     .collection-name { margin-left: 10px; }
     .collection-box, .preview-box { padding: 0 0 0 10px; }
-    .collection-icons { overflow-y: auto; height: calc(100vh - 68px - 139px - 110px); padding: 10px 0px; }
+    .collection-box { display: flex; flex-direction: column; flex: 1 0 300px; min-height: 300px; }
+    .collection-info, .collection-search { flex-shrink: 0; }
+    .collection-icons { flex: 1; min-height: 80px; overflow-y: auto; padding: 10px 0; }
+    .icon-entry { overflow-wrap: anywhere; }
+    .preview-box { flex-shrink: 0; padding-bottom: 12px; }
+    .preview-box > .row { margin-left: 0; margin-right: 0; }
+    .preview-box .col-sm-6 { padding-left: 0; padding-right: 8px; }
+    #preview { box-sizing: border-box; height: calc(1.5em + 20px); line-height: 1.5; padding: 9px; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; }
+    .collection-search { margin: 12px 0; }
+    .collection-search label { display: block; }
+    .collection-search input { box-sizing: border-box; width: 100%; max-width: 360px; }
+    .collection-search small { display: block; margin-top: 4px; }
+    .icon-entry[hidden], .collection-empty[hidden] { display: none !important; }
     .collection-info ul { margin: 0; padding: 0; }
     .collection-info ul li { display: inline-block; list-style-type: none; padding-right: 5px; }
-    footer { bottom: 20px; position: fixed; }
+    footer { flex-shrink: 0; }
+    footer .navbar { margin-bottom: 0; }
     .col-sm-6 { width:50%; float: left; }
     .col-sm-4 { width:33.3%; float: left; }
     /**.tab-pane, .hide { display: none; }**/
     button.active { border-style: inset; }
+    .box-size .btn { color: #000; }
   </style>
-  <script type="text/javascript" src="popup.js" defer="defer"></script>
+  <script type="text/javascript" src="popup.js?v=<?php echo filemtime(__DIR__ . '/popup.js'); ?>" defer="defer"></script>
 </head>
 <body class="container-fluid dokuwiki">
 
-  <div>
+  <div class="popup-content">
 
     <aside>
       <div class="collections">
@@ -168,9 +184,15 @@ header('X-UA-Compatible: IE=edge,chrome=1');
             </li>
           </ul>
         </div>
-        <div class="collection-icons">
+        <div class="collection-search">
+          <label for="icon-search">Search this collection</label>
+          <input type="search" id="icon-search" class="form-control" placeholder="Search icon names…" autocomplete="off" aria-controls="collection-icons" aria-describedby="icon-search-count" />
+          <small id="icon-search-count" role="status" aria-live="polite"></small>
+        </div>
+        <div class="collection-icons" id="collection-icons">
+          <p class="collection-empty" id="icon-search-empty" hidden>No icons found. Try another name.</p>
           <?php foreach (array_keys($collection_data['icons']) as $icon): ?>
-            <div class="col-sm-4 col-md-3">
+            <div class="col-sm-4 col-md-3 icon-entry">
               <button class="btn btn-default btn-xs btn-icon" title="<?php echo $icon ?>" data-icon-name="<?php echo $icon ?>">
                 <span class="iconify" data-icon="<?php echo $collection_name; ?>:<?php echo $icon ?>" data-height="32"></span>
               </button>
@@ -208,14 +230,16 @@ header('X-UA-Compatible: IE=edge,chrome=1');
           <div class="box-size col-sm-6">
             <label>Image size</label>
             <div class="btn-group btn-group-xs">
-              <button class="button btn btn-default" data-icon-size="small" title="Small size">
-                <img src="../../../images/media_size_small.png" />
-              </button><button class="button btn btn-default" data-icon-size="medium" title="Medium size">
-                <img src="../../../images/media_size_medium.png" />
-              </button><button class="button btn btn-default" data-icon-size="large" title="Large size">
-                <img src="../../../images/media_size_large.png" />
-              </button><button class="button btn btn-default active" data-icon-size="original" title="Original size">
-                <img src="../../../images/media_size_original.png" />
+              <button type="button" class="button btn btn-default" data-icon-size="small" title="Small size">
+                S
+              </button><button type="button" class="button btn btn-default" data-icon-size="medium" title="Medium size">
+                M
+              </button><button type="button" class="button btn btn-default" data-icon-size="large" title="Large size">
+                L
+              </button><button type="button" class="button btn btn-default active" data-icon-size="original" title="Original text size">
+                O
+              </button><button type="button" class="button btn btn-default" data-icon-size="fw" title="Fixed width (for navs)">
+                FW
               </button>
             </div>
           </div>
@@ -231,7 +255,7 @@ header('X-UA-Compatible: IE=edge,chrome=1');
   </div>
 
   <footer>
-    <nav class="navbar navbar-default navbar-fixed-bottom">
+    <nav class="navbar navbar-default">
       <div class="container-fluid">
         <div class="navbar-text">
           <button type="button" id="btn-preview" class="hidden btn btn-default">Preview code</button>
@@ -243,9 +267,9 @@ header('X-UA-Compatible: IE=edge,chrome=1');
   </footer>
 
   <input type="hidden" id="output" />
-  <input type="hidden" id="icon_pack" value="<?php echo $INPUT->str('pack', ''); ?>" />
+  <input type="hidden" id="icon_pack" value="<?php echo hsc($pack); ?>" />
   <input type="hidden" id="icon_name" />
-  <input type="hidden" id="icon_size" />
+  <input type="hidden" id="icon_size" value="original" />
   <input type="hidden" id="icon_align" />
 
 </body>

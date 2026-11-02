@@ -116,7 +116,7 @@
 	"cil": {
 		"name": "CoreUI Free",
 		"total": 502,
-		"author": "creativeLabs Łukasz Holeczek",
+		"author": "creativeLabs \u0141ukasz Holeczek",
 		"url": "https://github.com/coreui/coreui-icons",
 		"license": "CC BY 4.0",
 		"licenseURL": "https://creativecommons.org/licenses/by/4.0/",
@@ -131,38 +131,36 @@
 		"category": "General"
 	},
 	"fa-solid": {
-		"name": "Font Awesome 5 Solid",
-		"total": 964,
-		"author": "Dave Gandy",
-		"url": "http://fontawesome.io/",
+		"name": "Font Awesome Free Solid",
+		"version": "7.3.1",
+		"total": 1422,
+		"author": "Fonticons, Inc.",
 		"license": "CC BY 4.0",
-		"licenseURL": "https://creativecommons.org/licenses/by/4.0/",
-		"height": 32,
 		"samples": [
-			"search-plus",
-			"paste",
-			"comment-dots"
+			"wrench",
+			"house",
+			"user"
 		],
-		"version": "5.12.1",
-		"palette": "Colorless",
-		"category": "General"
+		"category": "General",
+		"palette": false,
+		"url": "https://fontawesome.com",
+		"licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
 	},
 	"fa-regular": {
-		"name": "Font Awesome 5 Regular",
-		"total": 151,
-		"author": "Dave Gandy",
-		"url": "http://fontawesome.io/",
+		"name": "Font Awesome Free Regular",
+		"version": "7.3.1",
+		"total": 169,
+		"author": "Fonticons, Inc.",
 		"license": "CC BY 4.0",
-		"licenseURL": "https://creativecommons.org/licenses/by/4.0/",
-		"height": 32,
 		"samples": [
 			"bell",
-			"comment",
-			"hand-point-left"
+			"heart",
+			"user"
 		],
-		"version": "5.12.1",
-		"palette": "Colorless",
-		"category": "General"
+		"category": "General",
+		"palette": false,
+		"url": "https://fontawesome.com",
+		"licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
 	},
 	"vaadin": {
 		"name": "Vaadin Icons",
@@ -585,20 +583,20 @@
 		"category": "General"
 	},
 	"fa": {
-		"name": "Font Awesome 4",
-		"total": 678,
-		"author": "Dave Gandy",
-		"url": "http://fontawesome.io/",
-		"license": "Open Font License",
-		"licenseURL": "http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL",
+		"name": "Font Awesome Free",
+		"version": "7.3.1",
+		"total": 1992,
+		"author": "Fonticons, Inc.",
+		"license": "CC BY 4.0",
 		"samples": [
 			"wrench",
-			"bell-o",
-			"user-o"
+			"house",
+			"github"
 		],
-		"version": "4.7.0",
-		"palette": "Colorless",
-		"category": "General"
+		"category": "General",
+		"palette": false,
+		"url": "https://fontawesome.com",
+		"licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
 	},
 	"zmdi": {
 		"name": "Material Design Iconic Font",
@@ -924,7 +922,7 @@
 	"cib": {
 		"name": "CoreUI Brands",
 		"total": 829,
-		"author": "creativeLabs Łukasz Holeczek",
+		"author": "creativeLabs \u0141ukasz Holeczek",
 		"url": "https://github.com/coreui/coreui-icons",
 		"license": "CC BY 4.0",
 		"licenseURL": "https://creativecommons.org/licenses/by/4.0/",
@@ -956,21 +954,20 @@
 		"category": "Brands / Social"
 	},
 	"fa-brands": {
-		"name": "Font Awesome 5 Brands",
-		"total": 442,
-		"author": "Dave Gandy",
-		"url": "http://fontawesome.io/",
+		"name": "Font Awesome Free Brands",
+		"version": "7.3.1",
+		"total": 572,
+		"author": "Fonticons, Inc.",
 		"license": "CC BY 4.0",
-		"licenseURL": "https://creativecommons.org/licenses/by/4.0/",
-		"height": 32,
 		"samples": [
-			"amazon",
-			"cc-visa",
-			"chrome"
+			"github",
+			"python",
+			"docker"
 		],
-		"version": "5.12.1",
-		"palette": "Colorless",
-		"category": "Brands / Social"
+		"category": "Brands / Social",
+		"palette": false,
+		"url": "https://fontawesome.com",
+		"licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
 	},
 	"brandico": {
 		"name": "Brandico Font",
@@ -1056,7 +1053,7 @@
 	"cif": {
 		"name": "CoreUI Flags",
 		"total": 197,
-		"author": "creativeLabs Łukasz Holeczek",
+		"author": "creativeLabs \u0141ukasz Holeczek",
 		"url": "https://github.com/coreui/coreui-icons",
 		"license": "CC BY 4.0",
 		"licenseURL": "https://creativecommons.org/licenses/by/4.0/",
@@ -1088,7 +1085,7 @@
 	"medical-icon": {
 		"name": "Medical Icons",
 		"total": 144,
-		"author": "Samuel Frémondière",
+		"author": "Samuel Fr\u00e9mondi\u00e8re",
 		"url": "https://github.com/samcome/webfont-medical-icons",
 		"license": "MIT",
 		"licenseURL": "https://raw.githubusercontent.com/samcome/webfont-medical-icons/master/LICENSE",

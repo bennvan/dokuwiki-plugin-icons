@@ -1,21 +1,14 @@
 # DokuWiki Plugin Icons
 
-## Font-Awesome
+## Font Awesome Free 7.3.1
 
-The iconic font and CSS framework
+Bundled SVG collections (`fa`, `fa-solid`, `fa-regular`, `fa-brands`) are
+converted from the official `@fortawesome/fontawesome-free` npm package.
+Copyright Fonticons, Inc. — https://fontawesome.com
 
-### License
-
-- The Font Awesome font is licensed under the SIL OFL 1.1:
-  - http://scripts.sil.org/OFL
-- Font Awesome CSS, LESS, and Sass files are licensed under the MIT License:
-  - https://opensource.org/licenses/mit-license.html
-- The Font Awesome documentation is licensed under the CC BY 3.0 License:
-  - https://creativecommons.org/licenses/by/3.0/
-- Attribution is no longer required as of Font Awesome 3.0, but much appreciated:
-  - `Font Awesome by Dave Gandy - http://fontawesome.io`
-- Full details: http://fontawesome.io/license/
-
+The icons are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+See [the complete upstream license](fontawesome-LICENSE.txt).
+Conversion changes the data format to Iconify JSON; artwork is unchanged.
 
 ## RPG-Awesome
 

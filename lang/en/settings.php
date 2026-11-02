@@ -7,7 +7,7 @@
  */
 
 $lang['defaultPack']             = 'Default icon package';
-$lang['defaultPack_o_fa']        = 'Font-Awesome';
+$lang['defaultPack_o_fa']        = 'Font Awesome Free';
 $lang['defaultPack_o_fl']        = 'Font-Linux';
 $lang['defaultPack_o_fugue']     = 'Fugue';
 $lang['defaultPack_o_glyphicon'] = 'Glyphicon';

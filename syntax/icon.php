@@ -227,12 +227,12 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
 
         } else {
 
-            if (! $icon == strstr($icon, ':')) {
-                $icon = "$pack:$icon";
+            if (strpos($icon, ':') === false) {
+                $icon = $this->getFlag('pack') . ':' . $icon;
             }
 
             $icon_markup = sprintf('<span class="iconify dw-icons %s" style="%s" title="%s" data-icon="%s" %s></span>',
-                $this->toClassString($this->getClasses()), $this->toInlineStyle($this->getStyles()), hsc($title ?? ''), $icon, $this->toAttributes($this->attrs)
+                $this->toClassString($this->getClasses()), $this->toInlineStyle($this->getStyles()), hsc($title ?? ''), hsc($icon), $this->toAttributes($this->attrs)
             );
 
         }
