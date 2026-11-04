@@ -28,5 +28,21 @@
 		],
 		"category": "Linux",
 		"palette": false
+	},
+	"iso7010": {
+		"name": "ISO 7010 Safety Signs",
+		"version": "2.0.0",
+		"total": 332,
+		"author": "Wikimedia contributors / Karl Norling",
+		"license": "Per-sign licences",
+		"samples": [
+			"m003",
+			"w001",
+			"f001"
+		],
+		"category": "Safety",
+		"palette": true,
+		"url": "https://github.com/karlnorling/iso-safety-signs",
+		"licenseUrl": "https://github.com/karlnorling/iso-safety-signs#license"
 	}
 }

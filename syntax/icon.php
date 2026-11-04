@@ -231,9 +231,15 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
                 $icon = $this->getFlag('pack') . ':' . $icon;
             }
 
-            $icon_markup = sprintf('<span class="iconify dw-icons %s" style="%s" title="%s" data-icon="%s" %s></span>',
-                $this->toClassString($this->getClasses()), $this->toInlineStyle($this->getStyles()), hsc($title ?? ''), hsc($icon), $this->toAttributes($this->attrs)
-            );
+            if ($renderer instanceof renderer_plugin_dw2pdf) {
+                $icon_markup = $this->pdfIcon($icon, $title ?? '');
+            } else {
+                // Iconify copies these dimensions onto the SVG after loading.
+                $styles = array_merge($this->getStyles(), $this->iconDimensions());
+                $icon_markup = sprintf('<span class="iconify dw-icons %s" style="%s" title="%s" data-icon="%s" %s></span>',
+                    $this->toClassString($this->getClasses()), hsc($this->toInlineStyle($styles)), hsc($title ?? ''), hsc($icon), $this->toAttributes($this->attrs)
+                );
+            }
 
         }
 
@@ -276,6 +282,36 @@ class syntax_plugin_icons_icon extends DokuWiki_Syntax_Plugin
         $renderer->doc .= $icon_markup;
         return true;
 
+    }
+
+    /** Match the syntax's size box without requiring JavaScript or HTTP in mPDF. */
+    protected function pdfIcon($icon, $title)
+    {
+        require_once dirname(__DIR__) . '/PdfIcon.php';
+        $file = \dokuwiki\plugin\icons\PdfIcon::file($icon, $this->styles['color'] ?? '#000000', in_array('size-fw', $this->classes));
+        if (!$file) return hsc($title ?: $icon);
+        $size = max(1, (int) $this->getConf('defaultSize')) . 'px';
+        $styles = array_merge($this->styles, ['width' => $size, 'height' => $size, 'vertical-align' => 'middle'], $this->iconDimensions());
+        return '<img src="' . hsc('dw2pdf://' . $file) . '" class="dw-icons ' . hsc($this->toClassString($this->classes))
+            . '" style="' . hsc($this->toInlineStyle($styles)) . '" alt="' . hsc($title) . '" title="' . hsc($title) . '" />';
+    }
+
+    /** Reserve the requested size in both placeholders and PDF images. */
+    protected function iconDimensions()
+    {
+        $height = $width = null;
+        if ((int) ($this->attrs['data-height'] ?? 0) > 0) {
+            $height = $width = (int) $this->attrs['data-height'] . 'px';
+        }
+        foreach ([2, 3, 4, 5] as $multiple) {
+            if (in_array('size-' . $multiple . 'x', $this->classes)) $height = $width = (16 * $multiple) . 'px';
+        }
+        if (in_array('size-fw', $this->classes)) {
+            $width = '1.25em';
+            $height = '1em';
+        }
+        if (in_array('size-lg', $this->classes)) $height = $width = '1.333333em';
+        return $width === null ? [] : ['width' => $width, 'height' => $height];
     }
 
     protected function isIcon()
